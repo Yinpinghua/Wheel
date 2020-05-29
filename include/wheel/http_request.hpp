@@ -234,7 +234,9 @@ namespace wheel {
 			}
 
 			bool update_and_expand_size(size_t size) {
-				if (update_size(size)) { //at capacity
+				update_size(size);
+
+				if (cur_size_ > MaxSize) {
 					return true;
 				}
 
@@ -421,14 +423,10 @@ namespace wheel {
 				return {};
 			}
 
-			bool update_size(size_t size) {
+			void update_size(size_t size) {
 				cur_size_ += size;
-				if (cur_size_ > MaxSize) {
-					return true;
-				}
-
-				return false;
 			}
+
 			bool has_recieved_all_part() {
 				return (body_len_ == cur_size_ - header_len_);
 			}
@@ -669,6 +667,13 @@ namespace wheel {
 
 			void resize_double() {
 				size_t size = buffer_.size();
+				size_t double_size = (2 * size);
+				if (double_size > MaxSize) {
+					size = MaxSize;
+					resize(size);
+					return;
+				}
+
 				resize(2 * size);
 			}
 
@@ -746,7 +751,7 @@ namespace wheel {
 			std::string method_str_;
 			std::string url_str_;
 			std::string gzip_str_;
-			//Æ´½ÓÆğÀ´µÄÊı¾İ
+			//æ‹¼æ¥èµ·æ¥çš„æ•°æ®
 			std::string client_chunked_data_; 
 			std::vector<upload_file> files_;
 			std::unordered_map<std::string, std::string> multipart_headers_;
